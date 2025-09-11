@@ -1,0 +1,12 @@
+[project]
+name = "scripts"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "boto3>=1.40.22",
+    "dotenv>=0.9.9",
+    "slack>=0.0.2",
+    "slack-sdk>=3.36.0",
+]
