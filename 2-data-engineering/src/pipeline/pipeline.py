@@ -133,10 +133,7 @@ class Pipeline:
 
         
 
-    def search(self, query: str, k: int) -> List[Dict[str, Any]]:
-        return self.hybrid_search(query=query, k=k)
-
-    def hybrid_search(self, query, k=10, text_weight=0.5, vector_weight=0.5):
+    def search(self, query: str, k: int, text_weight: float, vector_weight: float) -> List[Dict[str, Any]]:
         vec_results = self.vector_store.similarity_search_with_score(query, k=k)
 
         text_results = []
@@ -189,15 +186,19 @@ class Pipeline:
         for key, entry in combined.items():
             score = vector_weight * entry["v"] + text_weight * entry["t"]
             d = entry["doc"]
-            items.append((score, d))
+            items.append((score, d, entry["v"], entry["t"]))
 
         items.sort(key=lambda x: x[0], reverse=True)
         items = items[:k]
 
         result_list = []
-        for s, d in items:
+        for score, d, vec_score, txt_score in items:
             result_list.append({
-                "score": s,
+                "score": score,
+                "vector_score": vec_score,
+                "text_score": txt_score,
+                "vector_weight": vector_weight,
+                "text_weight": text_weight,
                 "page_content": d.page_content,
                 "metadata": d.metadata,
             })

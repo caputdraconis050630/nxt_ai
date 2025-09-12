@@ -17,6 +17,21 @@ with st.sidebar:
                 st.success("인덱스 초기화 성공\n비동기로 처리되므로, 실제 반영에는 살짝 시간이 걸릴 수 있숩니다.")
             else:
                 st.error("인덱스 초기화 실패")
+    
+    st.markdown("---")
+    st.subheader("가중치 설정\n(0 == 키워드로만, 1 == 벡터로만")
+    
+    vector_ratio = st.slider("가중치", min_value=0.0, max_value=1.0, value=0.5, step=0.1)
+    
+    # 가중치 계산
+    vector_weight = vector_ratio
+    text_weight = 1 - vector_ratio
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("벡터", f"{vector_weight:.1f}")
+    with col2:
+        st.metric("키워드", f"{text_weight:.1f}")
 
 # 메인 쪽
 tab1, tab2 = st.tabs(["파이프라인", "결과 확인(검색))"])
@@ -90,11 +105,36 @@ with tab2:
         else:
             with st.spinner("검색중"):
                 try:
-                    search_results = pipeline.search(query=query, k=10)
+                    search_results = pipeline.search(
+                        query=query, 
+                        k=10, 
+                        text_weight=text_weight, 
+                        vector_weight=vector_weight
+                    )
                     st.success(f"{len(search_results)}개의 검색결과")
                     
-                    for result in search_results:
-                        with st.expander(f"**점수: {result['score']:.4f}** - Source: {result['metadata'].get('source', 'N/A')}"):
+                    for i, result in enumerate(search_results, 1):
+                        final_score = result['score']
+                        vec_score = result.get('vector_score', 0)
+                        txt_score = result.get('text_score', 0)
+                        vec_weight = result.get('vector_weight', 0.5)
+                        txt_weight = result.get('text_weight', 0.5)
+                        
+                        with st.expander(f"**#{i} 최종점수: {final_score:.4f}** - Source: {result['metadata'].get('source', 'N/A')}"):
+                            # 점수 각각 보여주기
+                            col1, col2, col3 = st.columns(3)
+                            with col1:
+                                st.metric("벡터 점수", f"{vec_score:.4f}")
+                                st.caption(f"가중치: {vec_weight}")
+                            with col2:
+                                st.metric("텍스트 점수", f"{txt_score:.4f}")
+                                st.caption(f"가중치: {txt_weight}")
+                            with col3:
+                                st.metric("최종 점수", f"{final_score:.4f}")
+                                st.caption(f"{vec_weight}×{vec_score:.3f} + {txt_weight}×{txt_score:.3f}")
+                            
+                            st.markdown("---")
+                            st.markdown("**문서 내용:**")
                             st.markdown(result['page_content'])
                             st.json({"metadata": result['metadata']}, expanded=False)
                 except Exception as e:
