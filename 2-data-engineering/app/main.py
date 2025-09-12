@@ -7,8 +7,7 @@ from src.pipeline.pipeline import get_pipeline
 load_dotenv()
 
 pipeline = get_pipeline()
-
-st.set_page_config(layout="wide")
+st.set_page_config(page_title="Data Engineering Demo", layout="wide")
 st.title("Data Engineering Demo")
 
 with st.sidebar:
