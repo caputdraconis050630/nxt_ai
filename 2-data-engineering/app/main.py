@@ -6,9 +6,6 @@ from src.pipeline.pipeline import get_pipeline
 
 load_dotenv()
 
-BEDROCK_EMBEDDING_MODEL_ID = os.getenv("BEDROCK_EMBEDDING_MODEL_ID")
-OPENSEARCH_ENDPOINT = os.getenv("OPENSEARCH_ENDPOINT")
-OPENSEARCH_INDEX_NAME = os.getenv("OPENSEARCH_INDEX_NAME")
 pipeline = get_pipeline()
 
 st.set_page_config(layout="wide")

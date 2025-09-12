@@ -1,5 +1,5 @@
 import re
-from typing import List, Sequence
+from typing import List
 
 PARAGRAPH_SPLIT_RE = re.compile(r"\n{2,}") # 문단 분할
 SENTENCE_SPLIT_RE = re.compile(r"(?<=[\.!\?]|[。！？])\s+|(?<=\n)\s*") # 문장 분할

@@ -27,9 +27,10 @@ def html_table_to_markdown(html: str) -> List[str]:
         rows: List[List[str]] = []
 
         # thead 가 있는 경우
-        if table.find("thead"):
-            for tr in table.find_all("tr"):
-                cells = []
+        thead = table.find("thead")
+        if thead:
+            for tr in thead.find_all("tr"):
+                cells = [cell.get_text(" ", strip=True) for cell in tr.find_all(["th", "td"])]
                 if cells:
                     rows.append(cells)
 

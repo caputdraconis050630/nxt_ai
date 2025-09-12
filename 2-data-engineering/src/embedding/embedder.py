@@ -48,9 +48,3 @@ class BedrockEmbedder: # AWS Bedrock Titan Text Embeddings V2 모델 기반 텍�
             print(f"임베딩 실패: '{text}'. error: {e}")
             return None
 
-def create_bedrock_embedder_from_env() -> Optional[BedrockEmbedder]:
-    try:
-        return BedrockEmbedder()
-    except Exception as e:
-        print(f"BedrockEmbedder 생성 실패: {e}")
-        return None

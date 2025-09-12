@@ -1,8 +1,5 @@
-import urllib.request
-import urllib.error
 from dataclasses import dataclass
 from typing import List, Dict, Any, Optional
-from urllib.parse import urlparse, urljoin
 from bs4 import BeautifulSoup
 import requests
 

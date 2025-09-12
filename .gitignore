@@ -1,6 +1,7 @@
 .idea/*
 __pycache__/
 .pytest_cache/
+**/.pytest_cache/
 *.py[oc]
 build/
 dist/
@@ -26,3 +27,5 @@ terraform.rc
 **/__pycache__/*    
 **/.terraform/*
 .DS_Store
+terraform_outputs.json
+data/
