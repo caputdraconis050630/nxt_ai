@@ -1,0 +1,54 @@
+service: ojirapper-slack-bot
+
+frameworkVersion: '3'
+useDotenv: true
+provider:
+  name: aws
+  runtime: python3.11
+  region: ap-northeast-2
+  stage: dev
+  
+  ecr:
+    images:
+      appimage:
+        path: ./
+        platform: linux/amd64
+
+  environment:
+    SLACK_BOT_TOKEN: ${ssm:/ojirapper-slack-bot/slack-bot-token}
+    RAG_CHAIN_LAMBDA_NAME: ${self:service}-${self:provider.stage}-ragChain
+    BEDROCK_KB_ID: ${env:BEDROCK_KB_ID}
+    BEDROCK_MODEL_ID: ${env:BEDROCK_MODEL_ID}
+    SLACK_CHANNEL_ID: ${env:SLACK_CHANNEL_ID}
+    SLACK_WORKSPACE: ${env:SLACK_WORKSPACE}
+    SLACK_999_CHANNEL_ID: ${env:SLACK_999_CHANNEL_ID}
+    MCP_SERVER_ENDPOINT: ${ssm:/ojirapper-slack-bot/mcp-server-endpoint}
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - lambda:InvokeFunction
+            - bedrock:InvokeModel
+            - bedrock:Retrieve
+          Resource: "*"
+
+functions:
+  handler:
+    image:
+      name: appimage
+      command:
+        - handler.main
+    events:
+      - httpApi:
+          path: /
+          method: post
+
+  ragChain:
+    image:
+      name: appimage
+      command:
+        - rag_chain.main
+    timeout: 300
+
