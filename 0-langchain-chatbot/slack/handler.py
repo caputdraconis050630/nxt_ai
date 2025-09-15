@@ -13,6 +13,11 @@ lambda_client = boto3.client("lambda")
 SLACK_TOKEN = os.getenv("SLACK_BOT_TOKEN")
 RAG_CHAIN_LAMBDA_NAME = os.getenv("RAG_CHAIN_LAMBDA_NAME")
 SLACK_CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID")
+IGNORE_KEYWORDS = [
+    # 해당 키워드들이 포함된 문의인 경우, 무시하도록
+    # 체인 앞에 이러한 작업을 붙힐 수도 있겠지만, 이와 같은 키워드 처리 방식으로도 충분히 가능할 것 같습니다.
+    "권한", "부여", "iam", "role", "역할"
+]
 
 slack_client = WebClient(token=SLACK_TOKEN)
 
@@ -44,7 +49,11 @@ def handle_slack_event(event):
         
         if SLACK_CHANNEL_ID and event.get("channel") != SLACK_CHANNEL_ID: # 채널 필터링
             return
-
+        
+        user_question = event.get("text").lower()
+        if any(keyword in user_question for keyword in IGNORE_KEYWORDS):
+            logger.info("발견된 키워드: " + keyword)
+            return
         process_message_event(event)
 
 def process_message_event(event):
