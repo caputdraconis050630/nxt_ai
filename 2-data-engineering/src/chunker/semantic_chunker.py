@@ -1,7 +1,7 @@
 import math
 import re
 from typing import List, Optional
-from ..embedding.embedder import BedrockEmbedder
+from langchain_core.embeddings import Embeddings
 
 SENT_SPLIT = re.compile(r"(?<=[\.!\?]|[。！？])\s+|(?<=\n)\s*")
 threshold = 0.7
@@ -38,7 +38,8 @@ def cosine_sim(vec1, vec2):
     return dot / (norm1 * norm2)
 
 
-def semantic_chunk(text: str, target_chars: int, embedder: BedrockEmbedder) -> List[str]:
+
+def semantic_chunk(text: str, target_chars: int, embedder: Embeddings) -> List[str]:
     if not text:
         return []
 
@@ -58,9 +59,9 @@ def semantic_chunk(text: str, target_chars: int, embedder: BedrockEmbedder) -> L
         
         if current_chunk_embedding is None:
             current_chunk_text = ' '.join(current_chunk_sentences)
-            current_chunk_embedding = embedder.embed_text(current_chunk_text)
+            current_chunk_embedding = embedder.embed_query(current_chunk_text)
         
-        sentence_embedding = embedder.embed_text(sentence)
+        sentence_embedding = embedder.embed_query(sentence)
         
         similarity = cosine_sim(current_chunk_embedding, sentence_embedding)
         

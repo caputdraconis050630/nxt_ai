@@ -9,7 +9,6 @@ from ..cleaning.text_normalize import pdf_to_plain, web_to_plain
 from ..cleaning.table_to_markdown import pdf_text_to_markdown
 from ..structuring.structurer import DocumentStructurer
 from langchain_core.documents import Document
-from ..embedding.embedder import BedrockEmbedder
 from opensearchpy import AWSV4SignerAuth, RequestsHttpConnection
 import boto3
 import os
@@ -20,7 +19,6 @@ class Pipeline:
         self.embeddings = embeddings
         self.index_name = index_name
         self.structurer = DocumentStructurer()
-        self.bedrock_embedder = BedrockEmbedder()
 
         credentials = boto3.Session().get_credentials()
         auth = AWSV4SignerAuth(credentials, os.getenv("AWS_REGION"), "aoss")
@@ -90,7 +88,7 @@ class Pipeline:
             chunks = semantic_chunk(
                 text=merged_content,
                 target_chars=chunk_size,
-                embedder=self.bedrock_embedder
+                embedder=self.embeddings
             )
         elif chunker == "fixed":
             chunks = fixed_chunk(merged_content, max_chars=chunk_size, overlap=chunk_overlap)
